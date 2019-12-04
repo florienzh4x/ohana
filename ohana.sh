@@ -25,9 +25,16 @@ wpPath=( '/' 'app' 'cms' '.wp' '.cms' '.wordpress' '.old' '.old_wp' 'wp' 'WP' 'w
 wpSub=( 'app' 'blog' 'blogs' 'new' 'wp' 'wordpress' 'site' 'blogwp' 'cms' 'demo' 'beta' 'portal' 'web' 'webs' 'home' 'news' 'test' 'old' 'webapp' )
 pathlist=( '/' 'backend' 'app' 'cms' '.cms' '.old' 'old' 'oldsite' 'OLD' 'home' 'Home' 'demo' 'page' 'new' 'main' 'cms_demo' 'cms/app' 'v1' 'v2' 'v3' 'v4' 'site' 'site/app' )
 sublist=( 'app' 'backend' 'blog' 'blogs' 'new' 'site' 'cms' 'demo' 'beta' 'portal' 'web' 'webs' 'home' 'news' 'test' 'old' 'webapp' )
+
+# timthumb(){
+	
+# }
+# phpthumb(){
+# 	filename=('phpThumb.php' 'thumb.php' 'phpthumb.php' '/phpThumb/phpThumb.php')
+# }
 proxyTest(){
 	PROXY="$1"
-	PROXCON=$(curl -skL -x $PROXY --connect-timeout 5 --max-time 5 "https://api.hackertarget.com/reverseiplookup/?q=abaykan.com" 2> /dev/null)
+	PROXCON=$(curl -skL -x $PROXY --connect-timeout 10 --max-time 10 "https://api.hackertarget.com/reverseiplookup/?q=abaykan.com" 2> /dev/null)
 	if [[ $PROXCON =~ "abaykan.com" ]]
 	then
 		echo "[OK] ${PROXY}"
@@ -63,7 +70,7 @@ proxyCreator(){
 		PORT_PROX=$(echo $((0x${PORT_PROXT})))
 		echo "${IP_PROX}:${PORT_PROX}" >> proxylist.zo.temp
 	done
-	LIMITATOR=30
+	LIMITATOR=20
 	(
 		for PROXY in $(cat proxylist.zo.temp);
 		do 
@@ -145,10 +152,9 @@ phpunit(){
 reverseIP(){
 	API="https://api.hackertarget.com/reverseiplookup/?q="
 	target="$1"
-	rev=$(curl -skL -x $(cat proxylive.zo | sort -R | head -1) --compressed --connect-timeout 20 "${API}${target}" | grep -v 'cpanel.' | grep -v 'webmail.')
+	rev=$(curl -skL -x $(cat proxylive.zo | sort -R | head -1) --compressed --connect-timeout 20 "${API}${target}" | grep -v 'googleusercontent.' | grep -v 'webdisk.' | grep -v 'amazonaws.com' | grep -v 'www.' | grep -v 'cpanel.' | grep -v 'webmail.' | grep -v 'cloudflare.' )
 	if [[ $rev =~ "error check your search parameter" ]]; then
 		printf "${putih}[${biru}ReverseIP${putih}]${cyan} $target ${putih}| ${merah}Error: ${putih}check your search parameter${normal}\n"
-		echo "$target" >> reverse-result.txt.tmp
 	elif [[ $rev =~ "No DNS A records found for" ]]; then
 		printf "${putih}[${biru}ReverseIP${putih}]${cyan} $target ${putih}| ${merah}Error: ${putih}No DNS A records found for ${target} ${normal}\n"
 		echo "$target" >> reverse-result.txt.tmp
@@ -208,6 +214,19 @@ execPath(){
 		wpConfig $target
 	done
 }
+rangeIp(){
+	if [[ $remove == '1' ]]; then
+		ip=$(echo $ips.{0..255} | tr ' ' '\n')
+		echo "$ip" >> range_ip_result.txt
+		echo "$ips" >> ips1.temp
+	else
+		for ipx in $(echo $ips.{0..255} | tr ' ' '\n'); do
+			ip=$(echo $ipx.{0..255} | tr ' ' '\n');
+			echo "$ip" >> range_ip_result.txt
+		done
+		echo "$ips" >> ips2.temp
+	fi
+}
 
 echo "############### OHANA ###############"
 echo "====================================="
@@ -217,17 +236,20 @@ echo "3. Proxy Grabber (nb: use before reverse ip)"
 echo "4. Laravel PHPUNIT"
 echo "5. Domain Generator"
 echo "6. Proxy Check Live"
+echo "7. Range IP 0-255"
 echo "====================================="
 echo "#####################################"
 printf "Select Menu: "; read menu;
 
 if [[ $menu -eq 1 ]]; then
 	clear
-	printf "Your List: ";ls | grep '.txt';
+	printf "Your List: ";ls;
 	printf "Input Your List: ";read listo;
+	printf "Thread: ";read sending;
+	printf "Delay: ";read tidur;
 
-	tidur=1
-	sending=1
+	# tidur=1
+	# sending=1
 	hitung=0
 	IFS=$'\r\n' GLOBIGNORE='*' command eval 'list=($(cat $listo))'
 	for (( i = 0; i < "${#list[@]}"; i++ )); do
@@ -248,13 +270,14 @@ if [[ $menu -eq 1 ]]; then
 	wait
 elif [[ $menu -eq 2 ]]; then
 	clear
-	printf "Your List: ";ls | grep '.txt';
+	printf "Your List: ";ls;
 	printf "Input Your List: ";read listo;
+	printf "Thread: ";read sending;
+	printf "Delay: ";read tidur;
 
-	tidur=5
-	sending=20
+	# tidur=1
+	# sending=1
 	hitung=0
-
 	IFS=$'\r\n' GLOBIGNORE='*' command eval 'list=($(cat $listo))'
 	for (( i = 0; i < "${#list[@]}"; i++ )); do
 
@@ -282,11 +305,13 @@ elif [[ $menu -eq 3 ]]; then
 	proxyCreator
 elif [[ $menu -eq 4 ]]; then
 	clear
-	printf "Your List: ";ls | grep '.txt';
+	printf "Your List: ";ls;
 	printf "Input Your List: ";read listo;
+	printf "Thread: ";read sending;
+	printf "Delay: ";read tidur;
 
-	tidur=10
-	sending=1
+	# tidur=1
+	# sending=1
 	hitung=0
 	IFS=$'\r\n' GLOBIGNORE='*' command eval 'list=($(cat $listo))'
 	for (( i = 0; i < "${#list[@]}"; i++ )); do
@@ -312,11 +337,13 @@ elif [[ $menu -eq 5 ]]; then
 	done
 elif [[ $menu -eq 6 ]]; then
 	clear
-	printf "Your List: ";ls | grep '.txt';
+	printf "Your List: ";ls;
 	printf "Input Your List: ";read listo;
+	printf "Thread: ";read sending;
+	printf "Delay: ";read tidur;
 
-	tidur=10
-	sending=5
+	# tidur=1
+	# sending=1
 	hitung=0
 	IFS=$'\r\n' GLOBIGNORE='*' command eval 'list=($(cat $listo))'
 	for (( i = 0; i < "${#list[@]}"; i++ )); do
@@ -334,4 +361,47 @@ elif [[ $menu -eq 6 ]]; then
 	cat proxylist.zo.live | sort -nr | uniq >> proxylive.zo
 	echo "DONE: You got $(cat proxylive.zo | wc -l) good proxies."
 	rm -rf proxylist.zo.*
+elif [[ $menu -eq 7 ]]; then
+	clear
+	printf "Your List: ";ls;
+	printf "Input Your List: ";read listo;
+	echo "Remove Digit: "
+	echo "1. Last Digit (ex: 8.8.8)"
+	echo "2. Two Last Digit (ex: 8.8)"
+	printf "Choose? (1/2): "; read remove;
+	echo
+	IFS=$'\r\n' GLOBIGNORE='*' command eval 'list=($(cat $listo))'
+	for (( i = 0; i < "${#list[@]}"; i++ )); do
+		if [[ $remove == '1' ]]; then
+			ips=$(echo ${list[$i]} | cut -d"." -f1-3)
+			printf "$putih[$ijo+$putih] ${cyan}Range IP ${kuning}$ips.0 ${putih}=> ${kuning}$ips.255"
+			if [[ ! -f ips1.temp ]]; then
+				rangeIp
+				printf " $putih[${ijo}DONE$putih]\n"
+			else
+				if [[ $(cat ips1.temp) =~ $ips ]]; then
+					printf " $putih[${biru}DUPLICATE$putih]\n"
+				else
+					rangeIp
+					printf " $putih[${ijo}DONE$putih]\n"
+				fi
+			fi
+		fi
+		if [[ $remove == '2' ]]; then
+			ips=$(echo ${list[$i]} | cut -d"." -f1-2)
+			printf "$putih[$ijo+$putih] ${cyan}Range IP ${kuning}$ips.0.0 ${putih}=> ${kuning}$ips.255.255"
+			if [[ ! -f ips2.temp ]]; then
+				rangeIp
+				printf " $putih[${ijo}DONE$putih]\n"
+			else
+				if [[ $(cat ips2.temp) =~ $ips ]]; then
+					printf " $putih[${biru}DUPLICATE$putih]\n"
+				else
+					rangeIp
+					printf " $putih[${ijo}DONE$putih]\n"
+				fi
+			fi
+		fi
+	done
+	wait
 fi
